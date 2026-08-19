@@ -23,7 +23,7 @@ export default function App() {
 
     const result = await MediaLibrary.getAssetsAsync({
       mediaType: MediaLibrary.MediaType.audio,
-      first: 1000,
+      first: 10,
     });
 
     setAudioFiles(result.assets);
