@@ -1,47 +1,60 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import {
+  FlatList,
   Pressable,
   StyleSheet,
   Text,
   useColorScheme,
   View,
 } from 'react-native';
-import { PRIMARY } from '../constants/colors';
+import { PRIMARY } from '../../constants/colors';
 
-const settings = [
+const queue = [
   {
     id: '1',
-    title: 'Appearance',
-    subtitle: 'Theme and display',
-    icon: 'color-palette-outline',
+    title: 'Blinding Lights',
+    artist: 'The Weeknd',
+    duration: '3:20',
   },
   {
     id: '2',
-    title: 'Playback',
-    subtitle: 'Audio quality and behavior',
-    icon: 'play-circle-outline',
+    title: 'Save Your Tears',
+    artist: 'The Weeknd',
+    duration: '3:35',
   },
   {
     id: '3',
-    title: 'Equalizer',
-    subtitle: 'Customize your sound',
-    icon: 'options-outline',
+    title: 'Levitating',
+    artist: 'Dua Lipa',
+    duration: '3:23',
   },
   {
     id: '4',
-    title: 'Notifications',
-    subtitle: 'Playback notifications',
-    icon: 'notifications-outline',
+    title: 'As It Was',
+    artist: 'Harry Styles',
+    duration: '2:47',
   },
   {
     id: '5',
-    title: 'Storage',
-    subtitle: 'Music and cache',
-    icon: 'server-outline',
+    title: 'Heat Waves',
+    artist: 'Glass Animals',
+    duration: '3:58',
+  },
+  {
+    id: '6',
+    title: 'Stay',
+    artist: 'The Kid LAROI',
+    duration: '2:21',
+  },
+  {
+    id: '7',
+    title: 'Perfect',
+    artist: 'Ed Sheeran',
+    duration: '4:23',
   },
 ];
 
-export default function Settings() {
+export default function Queue() {
   const isDark = useColorScheme() === 'dark';
 
   const colors = {
@@ -61,13 +74,8 @@ export default function Settings() {
     >
       <View style={styles.header}>
         <View>
-          <Text
-            style={[
-              styles.title,
-              { color: colors.text },
-            ]}
-          >
-            Settings
+          <Text style={[styles.title, { color: colors.text }]}>
+            Queue
           </Text>
 
           <Text
@@ -76,43 +84,53 @@ export default function Settings() {
               { color: colors.secondary },
             ]}
           >
-            Customize your music player
+            {queue.length} songs waiting
           </Text>
         </View>
 
-        <View style={styles.profile}>
+        <Pressable>
           <Ionicons
-            name="person"
-            size={21}
-            color={PRIMARY}
+            name="ellipsis-horizontal"
+            size={25}
+            color={colors.text}
           />
-        </View>
+        </Pressable>
       </View>
 
-      <View style={styles.list}>
-        {settings.map((item) => (
+      <FlatList
+        data={queue}
+        keyExtractor={(item) => item.id}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.list}
+        renderItem={({ item, index }) => (
           <Pressable
-            key={item.id}
             style={[
-              styles.setting,
+              styles.song,
               {
                 backgroundColor: colors.card,
                 borderColor: colors.border,
               },
             ]}
           >
-            <View style={styles.iconBox}>
+            <View style={styles.number}>
+              <Text style={{ color: colors.secondary }}>
+                {index + 1}
+              </Text>
+            </View>
+
+            <View style={styles.songIcon}>
               <Ionicons
-                name={item.icon as any}
-                size={22}
+                name="musical-note"
+                size={20}
                 color={PRIMARY}
               />
             </View>
 
-            <View style={styles.info}>
+            <View style={styles.songInfo}>
               <Text
+                numberOfLines={1}
                 style={[
-                  styles.settingTitle,
+                  styles.songTitle,
                   { color: colors.text },
                 ]}
               >
@@ -120,38 +138,29 @@ export default function Settings() {
               </Text>
 
               <Text
+                numberOfLines={1}
                 style={[
-                  styles.settingSubtitle,
+                  styles.artist,
                   { color: colors.secondary },
                 ]}
               >
-                {item.subtitle}
+                {item.artist}
               </Text>
             </View>
 
+            <Text style={{ color: colors.secondary }}>
+              {item.duration}
+            </Text>
+
             <Ionicons
-              name="chevron-forward"
-              size={19}
+              name="ellipsis-vertical"
+              size={20}
               color={colors.secondary}
+              style={{ marginLeft: 10 }}
             />
           </Pressable>
-        ))}
-      </View>
-
-      <View
-        style={[
-          styles.version,
-          { borderTopColor: colors.border },
-        ]}
-      >
-        <Text style={{ color: colors.secondary }}>
-          Music Player
-        </Text>
-
-        <Text style={{ color: colors.secondary }}>
-          Version 1.0.0
-        </Text>
-      </View>
+        )}
+      />
     </View>
   );
 }
@@ -164,7 +173,7 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 16,
     paddingTop: 10,
-    paddingBottom: 16,
+    paddingBottom: 12,
 
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -172,48 +181,44 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: '800',
   },
 
   subtitle: {
     marginTop: 4,
-    fontSize: 13,
-  },
-
-  profile: {
-    width: 42,
-    height: 42,
-
-    borderRadius: 14,
-    backgroundColor: '#d9f8ef',
-
-    justifyContent: 'center',
-    alignItems: 'center',
+    fontSize: 14,
   },
 
   list: {
     paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 10,
     gap: 10,
   },
 
-  setting: {
-    minHeight: 68,
+  song: {
+    minHeight: 62,
 
     borderRadius: 16,
     borderWidth: 1,
 
-    paddingHorizontal: 10,
+    paddingHorizontal: 8,
 
     flexDirection: 'row',
     alignItems: 'center',
   },
 
-  iconBox: {
-    width: 44,
-    height: 44,
+  number: {
+    width: 30,
+    alignItems: 'center',
+  },
 
-    borderRadius: 13,
+  songIcon: {
+    width: 40,
+    height: 40,
+
+    borderRadius: 12,
     backgroundColor: '#d9f8ef',
 
     justifyContent: 'center',
@@ -222,31 +227,17 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
 
-  info: {
+  songInfo: {
     flex: 1,
   },
 
-  settingTitle: {
+  songTitle: {
     fontSize: 16,
     fontWeight: '700',
   },
 
-  settingSubtitle: {
-    marginTop: 3,
-    fontSize: 12,
-  },
-
-  version: {
-    marginTop: 'auto',
-
-    marginHorizontal: 16,
-
-    paddingTop: 14,
-    paddingBottom: 8,
-
-    borderTopWidth: 1,
-
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  artist: {
+    marginTop: 4,
+    fontSize: 13,
   },
 });

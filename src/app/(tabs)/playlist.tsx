@@ -7,42 +7,42 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
-import { PRIMARY } from '../constants/colors';
+import { PRIMARY } from '../../constants/colors';
 
-const favorites = [
+const playlists = [
   {
     id: '1',
-    title: 'Blinding Lights',
-    artist: 'The Weeknd',
-    duration: '3:20',
+    name: 'My Favorites',
+    songs: 24,
+    description: 'Songs you love',
   },
   {
     id: '2',
-    title: 'Save Your Tears',
-    artist: 'The Weeknd',
-    duration: '3:35',
+    name: 'Chill Vibes',
+    songs: 31,
+    description: 'Relax and enjoy',
   },
   {
     id: '3',
-    title: 'Levitating',
-    artist: 'Dua Lipa',
-    duration: '3:23',
+    name: 'Workout',
+    songs: 18,
+    description: 'Energy for your workout',
   },
   {
     id: '4',
-    title: 'As It Was',
-    artist: 'Harry Styles',
-    duration: '2:47',
+    name: 'Road Trip',
+    songs: 42,
+    description: 'Perfect road songs',
   },
   {
     id: '5',
-    title: 'Heat Waves',
-    artist: 'Glass Animals',
-    duration: '3:58',
+    name: 'Late Night',
+    songs: 16,
+    description: 'Music after midnight',
   },
 ];
 
-export default function Favorites() {
+export default function Playlist() {
   const isDark = useColorScheme() === 'dark';
 
   const colors = {
@@ -63,75 +63,86 @@ export default function Favorites() {
       <View style={styles.header}>
         <View>
           <Text style={[styles.title, { color: colors.text }]}>
-            Favorites
+            Playlists
           </Text>
 
-          <Text style={[styles.subtitle, { color: colors.secondary }]}>
-            {favorites.length} favorite songs
+          <Text
+            style={[
+              styles.subtitle,
+              { color: colors.secondary },
+            ]}
+          >
+            {playlists.length} playlists
           </Text>
         </View>
 
-        <Ionicons
-          name="heart"
-          size={25}
-          color={PRIMARY}
-        />
+        <Pressable style={styles.addButton}>
+          <Ionicons
+            name="add"
+            size={25}
+            color="#fff"
+          />
+        </Pressable>
       </View>
 
       <FlatList
-        data={favorites}
+        data={playlists}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <Pressable
             style={[
-              styles.song,
+              styles.playlist,
               {
                 backgroundColor: colors.card,
                 borderColor: colors.border,
               },
             ]}
           >
-            <View style={styles.album}>
+            <View style={styles.cover}>
               <Ionicons
                 name="musical-notes"
-                size={22}
+                size={30}
                 color={PRIMARY}
               />
             </View>
 
-            <View style={styles.songInfo}>
+            <View style={styles.info}>
               <Text
                 numberOfLines={1}
                 style={[
-                  styles.songTitle,
+                  styles.name,
                   { color: colors.text },
                 ]}
               >
-                {item.title}
+                {item.name}
               </Text>
 
               <Text
                 numberOfLines={1}
                 style={[
-                  styles.artist,
+                  styles.description,
                   { color: colors.secondary },
                 ]}
               >
-                {item.artist}
+                {item.description}
+              </Text>
+
+              <Text
+                style={[
+                  styles.songs,
+                  { color: colors.secondary },
+                ]}
+              >
+                {item.songs} songs
               </Text>
             </View>
 
-            <Text style={{ color: colors.secondary }}>
-              {item.duration}
-            </Text>
-
             <Ionicons
-              name="heart"
+              name="chevron-forward"
               size={20}
-              color={PRIMARY}
-              style={styles.heart}
+              color={colors.secondary}
             />
           </Pressable>
         )}
@@ -148,7 +159,7 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: 16,
     paddingTop: 10,
-    paddingBottom: 12,
+    paddingBottom: 14,
 
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -165,50 +176,64 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
 
+  addButton: {
+    width: 42,
+    height: 42,
+
+    borderRadius: 14,
+    backgroundColor: PRIMARY,
+
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
   list: {
     paddingHorizontal: 16,
-    paddingTop: 8,
     paddingBottom: 10,
     gap: 10,
   },
 
-  song: {
-    minHeight: 64,
-    borderRadius: 16,
+  playlist: {
+    minHeight: 82,
+
+    borderRadius: 17,
     borderWidth: 1,
-    paddingHorizontal: 10,
+
+    padding: 10,
 
     flexDirection: 'row',
     alignItems: 'center',
   },
 
-  album: {
-    width: 42,
-    height: 42,
-    borderRadius: 12,
+  cover: {
+    width: 60,
+    height: 60,
+
+    borderRadius: 14,
     backgroundColor: '#d9f8ef',
 
     justifyContent: 'center',
     alignItems: 'center',
 
-    marginRight: 12,
+    marginRight: 13,
   },
 
-  songInfo: {
+  info: {
     flex: 1,
   },
 
-  songTitle: {
-    fontSize: 16,
+  name: {
+    fontSize: 17,
     fontWeight: '700',
   },
 
-  artist: {
+  description: {
     marginTop: 4,
     fontSize: 13,
   },
 
-  heart: {
-    marginLeft: 12,
+  songs: {
+    marginTop: 3,
+    fontSize: 12,
   },
 });

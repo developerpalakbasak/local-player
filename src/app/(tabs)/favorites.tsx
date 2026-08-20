@@ -7,9 +7,9 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
-import { PRIMARY } from '../constants/colors';
+import { PRIMARY } from '../../constants/colors';
 
-const queue = [
+const favorites = [
   {
     id: '1',
     title: 'Blinding Lights',
@@ -40,21 +40,9 @@ const queue = [
     artist: 'Glass Animals',
     duration: '3:58',
   },
-  {
-    id: '6',
-    title: 'Stay',
-    artist: 'The Kid LAROI',
-    duration: '2:21',
-  },
-  {
-    id: '7',
-    title: 'Perfect',
-    artist: 'Ed Sheeran',
-    duration: '4:23',
-  },
 ];
 
-export default function Queue() {
+export default function Favorites() {
   const isDark = useColorScheme() === 'dark';
 
   const colors = {
@@ -75,34 +63,27 @@ export default function Queue() {
       <View style={styles.header}>
         <View>
           <Text style={[styles.title, { color: colors.text }]}>
-            Queue
+            Favorites
           </Text>
 
-          <Text
-            style={[
-              styles.subtitle,
-              { color: colors.secondary },
-            ]}
-          >
-            {queue.length} songs waiting
+          <Text style={[styles.subtitle, { color: colors.secondary }]}>
+            {favorites.length} favorite songs
           </Text>
         </View>
 
-        <Pressable>
-          <Ionicons
-            name="ellipsis-horizontal"
-            size={25}
-            color={colors.text}
-          />
-        </Pressable>
+        <Ionicons
+          name="heart"
+          size={25}
+          color={PRIMARY}
+        />
       </View>
 
       <FlatList
-        data={queue}
+        data={favorites}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.list}
-        renderItem={({ item, index }) => (
+        renderItem={({ item }) => (
           <Pressable
             style={[
               styles.song,
@@ -112,16 +93,10 @@ export default function Queue() {
               },
             ]}
           >
-            <View style={styles.number}>
-              <Text style={{ color: colors.secondary }}>
-                {index + 1}
-              </Text>
-            </View>
-
-            <View style={styles.songIcon}>
+            <View style={styles.album}>
               <Ionicons
-                name="musical-note"
-                size={20}
+                name="musical-notes"
+                size={22}
                 color={PRIMARY}
               />
             </View>
@@ -153,10 +128,10 @@ export default function Queue() {
             </Text>
 
             <Ionicons
-              name="ellipsis-vertical"
+              name="heart"
               size={20}
-              color={colors.secondary}
-              style={{ marginLeft: 10 }}
+              color={PRIMARY}
+              style={styles.heart}
             />
           </Pressable>
         )}
@@ -181,13 +156,13 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: 30,
+    fontSize: 28,
     fontWeight: '800',
   },
 
   subtitle: {
     marginTop: 4,
-    fontSize: 14,
+    fontSize: 13,
   },
 
   list: {
@@ -198,26 +173,18 @@ const styles = StyleSheet.create({
   },
 
   song: {
-    minHeight: 62,
-
+    minHeight: 64,
     borderRadius: 16,
     borderWidth: 1,
-
-    paddingHorizontal: 8,
+    paddingHorizontal: 10,
 
     flexDirection: 'row',
     alignItems: 'center',
   },
 
-  number: {
-    width: 30,
-    alignItems: 'center',
-  },
-
-  songIcon: {
-    width: 40,
-    height: 40,
-
+  album: {
+    width: 42,
+    height: 42,
     borderRadius: 12,
     backgroundColor: '#d9f8ef',
 
@@ -239,5 +206,9 @@ const styles = StyleSheet.create({
   artist: {
     marginTop: 4,
     fontSize: 13,
+  },
+
+  heart: {
+    marginLeft: 12,
   },
 });
