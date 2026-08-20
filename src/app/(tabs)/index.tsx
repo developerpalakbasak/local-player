@@ -1,6 +1,10 @@
 import { PRIMARY, PRIMARY_LIGHT, PRIMARY_LIGHT_DARK } from '@/constants/colors';
+import { useAudio } from '@/context/AudioContext';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useFocusEffect } from 'expo-router';
+import { useCallback, useRef } from 'react';
 import {
+    GestureResponderEvent,
     Pressable,
     StyleSheet,
     Text,
@@ -8,9 +12,44 @@ import {
     View,
 } from 'react-native';
 
-
 export default function NowPlaying() {
     const isDark = useColorScheme() === 'dark';
+    const barRef = useRef<View>(null);
+
+    const {
+        currentSong,
+        queueName,
+        isPlaying,
+        currentTimeSec,
+        durationSec,
+        progressPercent,
+        loadQueue,
+        togglePlayPause,
+        playNext,
+        playPrevious,
+        seekTo,
+    } = useAudio();
+
+    useFocusEffect(
+        useCallback(() => {
+            loadQueue();
+        }, [])
+    );
+
+    const handleSeek = (e: GestureResponderEvent) => {
+        if (!durationSec || !barRef.current) return;
+
+        const touchX = e.nativeEvent.pageX;
+
+        barRef.current.measure((x, y, width, height, pageX) => {
+            if (width === 0) return;
+            const clickX = touchX - pageX;
+            const seekPercentage = Math.max(0, Math.min(1, clickX / width));
+            const seekTimeInSeconds = seekPercentage * durationSec;
+
+            seekTo(seekTimeInSeconds);
+        });
+    };
 
     const colors = {
         background: isDark ? '#09090b' : '#f8fafc',
@@ -60,7 +99,7 @@ export default function NowPlaying() {
                             },
                         ]}
                     >
-                        Playing from Queue
+                        Playing from {queueName}
                     </Text>
                 </View>
 
@@ -114,7 +153,7 @@ export default function NowPlaying() {
                         },
                     ]}
                 >
-                    Blinding Lights
+                    {currentSong?.filename || 'No Track Playing'}
                 </Text>
 
                 <Text
@@ -125,31 +164,39 @@ export default function NowPlaying() {
                         },
                     ]}
                 >
-                    The Weeknd
+                    {currentSong ? 'Local Audio' : 'Select a track from queue'}
                 </Text>
 
                 {/* Progress */}
 
                 <View style={styles.progressContainer}>
-                    <View
+                    <Pressable
+                        ref={barRef}
+                        onPress={handleSeek}
+                        hitSlop={{ top: 15, bottom: 15 }}
                         style={[
                             styles.progressBackground,
                             {
-                                backgroundColor:
-                                    colors.progressBackground,
+                                backgroundColor: colors.progressBackground,
                             },
                         ]}
                     >
-                        <View style={styles.progress} />
-                    </View>
+                        <View
+                            pointerEvents="none"
+                            style={[
+                                styles.progress,
+                                { width: `${progressPercent}%` },
+                            ]}
+                        />
+                    </Pressable>
 
                     <View style={styles.timeRow}>
                         <Text style={{ color: colors.secondary }}>
-                            1:24
+                            {formatDuration(currentTimeSec)}
                         </Text>
 
                         <Text style={{ color: colors.secondary }}>
-                            3:20
+                            {formatDuration(durationSec)}
                         </Text>
                     </View>
                 </View>
@@ -165,7 +212,7 @@ export default function NowPlaying() {
                         />
                     </Pressable>
 
-                    <Pressable>
+                    <Pressable onPress={playPrevious}>
                         <Ionicons
                             name="play-skip-back"
                             size={28}
@@ -173,15 +220,15 @@ export default function NowPlaying() {
                         />
                     </Pressable>
 
-                    <Pressable style={styles.playButton}>
+                    <Pressable style={styles.playButton} onPress={togglePlayPause}>
                         <Ionicons
-                            name="pause"
+                            name={isPlaying ? 'pause' : 'play'}
                             size={28}
                             color="#fff"
                         />
                     </Pressable>
 
-                    <Pressable>
+                    <Pressable onPress={playNext}>
                         <Ionicons
                             name="play-skip-forward"
                             size={28}
@@ -235,6 +282,13 @@ export default function NowPlaying() {
             </View>
         </View>
     );
+}
+
+function formatDuration(seconds: number) {
+    if (!seconds || isNaN(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
 const styles = StyleSheet.create({
@@ -323,7 +377,6 @@ const styles = StyleSheet.create({
     },
 
     progress: {
-        width: '42%',
         height: 5,
 
         backgroundColor: PRIMARY,

@@ -4,14 +4,19 @@ import {
     hasMusicData,
     initDatabase,
 } from '@/db/database';
-
 import { syncMusicLibrary } from '@/db/musicSync';
 import { useTheme } from '@/hooks/useColors';
 import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { StyleSheet } from 'react-native';
+import {
+    SafeAreaProvider,
+    SafeAreaView,
+} from 'react-native-safe-area-context';
 
 export default function RootLayout() {
-    const { colors } = useTheme();
+    const { isDark, colors } = useTheme();
 
     useEffect(() => {
         async function initializeMusic() {
@@ -65,18 +70,36 @@ export default function RootLayout() {
     }, []);
 
     return (
-        <Stack
-            screenOptions={{
-                headerShown: false,
+        <SafeAreaProvider>
+            <StatusBar style={isDark ? 'light' : 'dark'} />
 
-                contentStyle: {
-                    backgroundColor:
-                        colors.background,
-                },
-            }}
-        >
-            <Stack.Screen name="(tabs)" />
-            <Stack.Screen name="folder/[name]" />
-        </Stack>
+            <SafeAreaView
+                style={[
+                    styles.safeArea,
+                    {
+                        backgroundColor: colors.background,
+                    },
+                ]}
+                edges={['top', 'bottom']}
+            >
+                <Stack
+                    screenOptions={{
+                        headerShown: false,
+                        contentStyle: {
+                            backgroundColor: colors.background,
+                        },
+                    }}
+                >
+                    <Stack.Screen name="(tabs)" />
+                    <Stack.Screen name="folder/[name]" />
+                </Stack>
+            </SafeAreaView>
+        </SafeAreaProvider>
     );
 }
+
+const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+    },
+});

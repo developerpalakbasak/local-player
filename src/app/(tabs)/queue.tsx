@@ -1,69 +1,43 @@
+import { getAllQueues, getQueue, getQueueName, QueueItem } from '@/db/database';
+import { useTheme } from '@/hooks/useColors';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
 import {
   FlatList,
   Pressable,
   StyleSheet,
   Text,
-  useColorScheme,
   View,
 } from 'react-native';
 import { PRIMARY } from '../../constants/colors';
 
-const queue = [
-  {
-    id: '1',
-    title: 'Blinding Lights',
-    artist: 'The Weeknd',
-    duration: '3:20',
-  },
-  {
-    id: '2',
-    title: 'Save Your Tears',
-    artist: 'The Weeknd',
-    duration: '3:35',
-  },
-  {
-    id: '3',
-    title: 'Levitating',
-    artist: 'Dua Lipa',
-    duration: '3:23',
-  },
-  {
-    id: '4',
-    title: 'As It Was',
-    artist: 'Harry Styles',
-    duration: '2:47',
-  },
-  {
-    id: '5',
-    title: 'Heat Waves',
-    artist: 'Glass Animals',
-    duration: '3:58',
-  },
-  {
-    id: '6',
-    title: 'Stay',
-    artist: 'The Kid LAROI',
-    duration: '2:21',
-  },
-  {
-    id: '7',
-    title: 'Perfect',
-    artist: 'Ed Sheeran',
-    duration: '4:23',
-  },
-];
-
 export default function Queue() {
-  const isDark = useColorScheme() === 'dark';
+  const { colors } = useTheme();
 
-  const colors = {
-    background: isDark ? '#09090b' : '#f8fafc',
-    card: isDark ? '#18181b' : '#ffffff',
-    text: isDark ? '#ffffff' : '#111827',
-    secondary: isDark ? '#a1a1aa' : '#6b7280',
-    border: isDark ? '#27272a' : '#e5e7eb',
+  const [queueName, setQueueName] = useState<string>('Queue');
+  const [queue, setQueue] = useState<QueueItem[]>([]);
+
+  // Automatically reload data whenever the user navigates back to this screen
+  useFocusEffect(
+    useCallback(() => {
+      loadQueueData();
+    }, [])
+  );
+
+  const loadQueueData = () => {
+    const name = getQueueName();
+    const items = getQueue();
+
+    setQueueName(name);
+    setQueue(items);
   };
+
+  console.log("getQueue", JSON.stringify(queue, null, 2));
+
+  console.log("getQueueName", JSON.stringify(queueName, null, 2));
+  console.log("getAllQueues", JSON.stringify(getAllQueues(), null, 2));
+
 
   return (
     <View
@@ -72,10 +46,14 @@ export default function Queue() {
         { backgroundColor: colors.background },
       ]}
     >
+      {/* Header */}
       <View style={styles.header}>
-        <View>
-          <Text style={[styles.title, { color: colors.text }]}>
-            Queue
+        <View style={styles.headerTitleContainer}>
+          <Text
+            numberOfLines={1}
+            style={[styles.title, { color: colors.text }]}
+          >
+            {queueName}
           </Text>
 
           <Text
@@ -84,22 +62,27 @@ export default function Queue() {
               { color: colors.secondary },
             ]}
           >
-            {queue.length} songs waiting
+            {queue.length} {queue.length === 1 ? 'song' : 'songs'} in queue
           </Text>
         </View>
 
-        <Pressable>
+        <Pressable hitSlop={10}>
           <Ionicons
-            name="ellipsis-horizontal"
+            name="chevron-down-circle-outline"
             size={25}
             color={colors.text}
           />
         </Pressable>
       </View>
 
+      {/* Queue List */}
       <FlatList
         data={queue}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item, index) =>
+          item.queue_item_id
+            ? `${item.queue_item_id}`
+            : `${item.id}-${index}`
+        }
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.list}
         renderItem={({ item, index }) => (
@@ -112,12 +95,14 @@ export default function Queue() {
               },
             ]}
           >
+            {/* Track Index Position */}
             <View style={styles.number}>
               <Text style={{ color: colors.secondary }}>
                 {index + 1}
               </Text>
             </View>
 
+            {/* Song Icon */}
             <View style={styles.songIcon}>
               <Ionicons
                 name="musical-note"
@@ -126,6 +111,7 @@ export default function Queue() {
               />
             </View>
 
+            {/* Song Information */}
             <View style={styles.songInfo}>
               <Text
                 numberOfLines={1}
@@ -134,7 +120,7 @@ export default function Queue() {
                   { color: colors.text },
                 ]}
               >
-                {item.title}
+                {item.filename}
               </Text>
 
               <Text
@@ -144,12 +130,13 @@ export default function Queue() {
                   { color: colors.secondary },
                 ]}
               >
-                {item.artist}
+                {item.uri ? 'Local Audio' : 'Unknown Artist'}
               </Text>
             </View>
 
-            <Text style={{ color: colors.secondary }}>
-              {item.duration}
+            {/* Formatted Duration */}
+            <Text style={{ color: colors.secondary, fontSize: 12 }}>
+              {formatDuration(item.duration)}
             </Text>
 
             <Ionicons
@@ -160,16 +147,39 @@ export default function Queue() {
             />
           </Pressable>
         )}
+        ListEmptyComponent={
+          <View style={styles.empty}>
+            <Ionicons
+              name="musical-notes-outline"
+              size={44}
+              color={colors.secondary}
+            />
+            <Text
+              style={[
+                styles.emptyText,
+                { color: colors.secondary },
+              ]}
+            >
+              No songs in queue
+            </Text>
+          </View>
+        }
       />
     </View>
   );
+}
+
+function formatDuration(seconds: number) {
+  if (!seconds) return '0:00';
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs.toString().padStart(2, '0')}`;
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-
   header: {
     paddingHorizontal: 16,
     paddingTop: 10,
@@ -179,24 +189,24 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-
+  headerTitleContainer: {
+    flex: 1,
+    marginRight: 10,
+  },
   title: {
-    fontSize: 30,
+    fontSize: 26,
     fontWeight: '800',
   },
-
   subtitle: {
     marginTop: 4,
-    fontSize: 14,
+    fontSize: 13,
   },
-
   list: {
     paddingHorizontal: 16,
     paddingTop: 8,
-    paddingBottom: 10,
+    paddingBottom: 16,
     gap: 10,
   },
-
   song: {
     minHeight: 62,
 
@@ -208,12 +218,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-
   number: {
-    width: 30,
+    width: 28,
     alignItems: 'center',
   },
-
   songIcon: {
     width: 40,
     height: 40,
@@ -226,18 +234,24 @@ const styles = StyleSheet.create({
 
     marginRight: 12,
   },
-
   songInfo: {
     flex: 1,
+    minWidth: 0,
   },
-
   songTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
   },
-
   artist: {
-    marginTop: 4,
-    fontSize: 13,
+    marginTop: 2,
+    fontSize: 12,
+  },
+  empty: {
+    paddingTop: 100,
+    alignItems: 'center',
+  },
+  emptyText: {
+    marginTop: 12,
+    fontSize: 14,
   },
 });

@@ -1,3 +1,4 @@
+import { createQueue } from '@/db/database';
 import { useAudios } from '@/hooks/getAudios';
 import { useAudioFolders } from '@/hooks/getFolders';
 import { useTheme } from '@/hooks/useColors';
@@ -41,6 +42,25 @@ export default function FolderDetailScreen() {
 
         getAudiosFromFolder(name);
     }, [name]);
+
+    // Handle song selection: reorders list from tapped song onward, writes queue to DB, routes to player
+    const handleSongPress = (selectedIndex: number) => {
+        if (!audioFiles || audioFiles.length === 0) return;
+
+        // Reorder queue so the clicked track starts first
+        const orderedQueue = [
+            ...audioFiles.slice(selectedIndex),
+            ...audioFiles.slice(0, selectedIndex),
+        ];
+
+        const songIds = orderedQueue.map((song) => song.id);
+
+        // Save ordered song IDs into SQLite queue table
+        createQueue(name, songIds);
+
+        // Navigate to player or queue tab
+        router.push('/(tabs)/queue');
+    };
 
     const folder = folders.find(
         (item) => item.name === name
@@ -140,6 +160,7 @@ export default function FolderDetailScreen() {
                     }
                     renderItem={({ item, index }) => (
                         <Pressable
+                            onPress={() => handleSongPress(index)}
                             style={[
                                 styles.song,
                                 {

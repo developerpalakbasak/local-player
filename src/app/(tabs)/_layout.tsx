@@ -12,6 +12,7 @@ import {
 } from 'react-native-safe-area-context';
 
 import { useTheme } from '@/hooks/useColors';
+import { AudioProvider } from '@/context/AudioContext';
 
 const ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
   queue: 'list',
@@ -27,39 +28,42 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider>
-      <StatusBar
-        style={isDark ? 'light' : 'dark'}
-      />
+      <AudioProvider>
 
-      <SafeAreaView
-        style={[
-          styles.safeArea,
-          {
-            backgroundColor: colors.background,
-          },
-        ]}
-        edges={['top', 'bottom']}
-      >
-        <Tabs
-          screenOptions={{
-            headerShown: false,
+        <StatusBar
+          style={isDark ? 'light' : 'dark'}
+        />
 
-            sceneStyle: {
+        <SafeAreaView
+          style={[
+            styles.safeArea,
+            {
               backgroundColor: colors.background,
             },
-
-            animation: 'none',
-            lazy: false,
-          }}
-          tabBar={(props) => (
-            <CustomTabBar
-              {...props}
-              colors={colors}
-            />
-          )}
+          ]}
+          edges={['top', 'bottom']}
         >
-        </Tabs>
-      </SafeAreaView>
+          <Tabs
+            screenOptions={{
+              headerShown: false,
+
+              sceneStyle: {
+                backgroundColor: colors.background,
+              },
+
+              animation: 'none',
+              lazy: false,
+            }}
+            tabBar={(props) => (
+              <CustomTabBar
+                {...props}
+                colors={colors}
+              />
+            )}
+          >
+          </Tabs>
+        </SafeAreaView>
+      </AudioProvider>
     </SafeAreaProvider>
   );
 }

@@ -38,7 +38,7 @@ export function useAudios() {
 
             console.log(
                 'All Audios from DB:',
-                result
+                // result
             );
 
             return result;
@@ -77,7 +77,7 @@ export function useAudios() {
 
             console.log(
                 `Audios from "${folderName}" from DB:`,
-                result
+                // result
             );
 
             return result;
