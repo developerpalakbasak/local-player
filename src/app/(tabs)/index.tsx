@@ -28,6 +28,8 @@ export default function NowPlaying() {
         playNext,
         playPrevious,
         seekTo,
+        cycleRepeatMode,
+        repeatMode
     } = useAudio();
 
     useFocusEffect(
@@ -236,12 +238,17 @@ export default function NowPlaying() {
                         />
                     </Pressable>
 
-                    <Pressable>
-                        <Ionicons
-                            name="repeat"
-                            size={23}
-                            color={colors.secondary}
-                        />
+                    <Pressable onPress={cycleRepeatMode} hitSlop={8}>
+                        <View>
+                            <Ionicons
+                                name="repeat"
+                                size={23}
+                                color={repeatMode === 'off' ? colors.secondary : PRIMARY}
+                            />
+                            {repeatMode === 'one' && (
+                                <Text style={styles.repeatBadge}>1</Text>
+                            )}
+                        </View>
                     </Pressable>
                 </View>
 
@@ -295,7 +302,14 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-
+    repeatBadge: {
+        position: 'absolute',
+        right: -6,
+        bottom: -4,
+        fontSize: 10,
+        fontWeight: '800',
+        color: PRIMARY,
+    },
     header: {
         paddingHorizontal: 16,
         paddingTop: 10,

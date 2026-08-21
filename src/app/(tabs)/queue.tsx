@@ -1,4 +1,5 @@
-import { getAllQueues, getQueue, getQueueName, QueueItem } from '@/db/database';
+import { useAudio } from '@/context/AudioContext';
+import { getQueue, getQueueName, QueueItem } from '@/db/database';
 import { useTheme } from '@/hooks/useColors';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useFocusEffect } from 'expo-router';
@@ -14,6 +15,7 @@ import { PRIMARY } from '../../constants/colors';
 
 export default function Queue() {
   const { colors } = useTheme();
+  const { playAtIndex } = useAudio();
 
   const [queueName, setQueueName] = useState<string>('Queue');
   const [queue, setQueue] = useState<QueueItem[]>([]);
@@ -32,12 +34,6 @@ export default function Queue() {
     setQueueName(name);
     setQueue(items);
   };
-
-  console.log("getQueue", JSON.stringify(queue, null, 2));
-
-  console.log("getQueueName", JSON.stringify(queueName, null, 2));
-  console.log("getAllQueues", JSON.stringify(getAllQueues(), null, 2));
-
 
   return (
     <View
@@ -87,6 +83,7 @@ export default function Queue() {
         contentContainerStyle={styles.list}
         renderItem={({ item, index }) => (
           <Pressable
+            onPress={() => playAtIndex(index)}
             style={[
               styles.song,
               {

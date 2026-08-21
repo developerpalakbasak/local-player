@@ -1,5 +1,6 @@
 // app/_layout.tsx
 
+import { AudioProvider } from '@/context/AudioContext';
 import {
     hasMusicData,
     initDatabase,
@@ -71,29 +72,32 @@ export default function RootLayout() {
 
     return (
         <SafeAreaProvider>
-            <StatusBar style={isDark ? 'light' : 'dark'} />
+            <AudioProvider>
 
-            <SafeAreaView
-                style={[
-                    styles.safeArea,
-                    {
-                        backgroundColor: colors.background,
-                    },
-                ]}
-                edges={['top', 'bottom']}
-            >
-                <Stack
-                    screenOptions={{
-                        headerShown: false,
-                        contentStyle: {
+                <StatusBar style={isDark ? 'light' : 'dark'} />
+
+                <SafeAreaView
+                    style={[
+                        styles.safeArea,
+                        {
                             backgroundColor: colors.background,
                         },
-                    }}
+                    ]}
+                    edges={['top', 'bottom']}
                 >
-                    <Stack.Screen name="(tabs)" />
-                    <Stack.Screen name="folder/[name]" />
-                </Stack>
-            </SafeAreaView>
+                    <Stack
+                        screenOptions={{
+                            headerShown: false,
+                            contentStyle: {
+                                backgroundColor: colors.background,
+                            },
+                        }}
+                    >
+                        <Stack.Screen name="(tabs)" />
+                        <Stack.Screen name="folder/[name]" />
+                    </Stack>
+                </SafeAreaView>
+            </AudioProvider>
         </SafeAreaProvider>
     );
 }

@@ -1,7 +1,8 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Tabs } from 'expo-router';
+import { router, Tabs, usePathname } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
+  BackHandler,
   Pressable,
   StyleSheet,
   View,
@@ -12,7 +13,7 @@ import {
 } from 'react-native-safe-area-context';
 
 import { useTheme } from '@/hooks/useColors';
-import { AudioProvider } from '@/context/AudioContext';
+import { useEffect } from 'react';
 
 const ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
   queue: 'list',
@@ -23,12 +24,37 @@ const ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
   settings: 'settings',
 };
 
+
+
+
+function AndroidBackHandler() {
+    const pathname = usePathname();
+
+    useEffect(() => {
+        const TAB_PATHS = ['/', '/queue', '/folders', '/playlist', '/favorites', '/settings'];
+        if (!TAB_PATHS.includes(pathname)) return;
+
+        const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+            if (pathname === '/') {
+                BackHandler.exitApp();   // Now Playing → exit
+                return true;
+            }
+            router.navigate('/(tabs)');  // any other tab → Now Playing
+            return true;
+        });
+
+        return () => sub.remove();
+    }, [pathname]);
+
+    return null;
+}
+
 export default function RootLayout() {
   const { isDark, colors } = useTheme();
 
   return (
     <SafeAreaProvider>
-      <AudioProvider>
+     
 
         <StatusBar
           style={isDark ? 'light' : 'dark'}
@@ -63,7 +89,6 @@ export default function RootLayout() {
           >
           </Tabs>
         </SafeAreaView>
-      </AudioProvider>
     </SafeAreaProvider>
   );
 }

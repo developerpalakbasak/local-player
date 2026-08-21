@@ -1,3 +1,4 @@
+import { useAudio } from '@/context/AudioContext';
 import { createQueue } from '@/db/database';
 import { useAudios } from '@/hooks/getAudios';
 import { useAudioFolders } from '@/hooks/getFolders';
@@ -13,6 +14,7 @@ import {
     Text,
     View,
 } from 'react-native';
+
 
 export default function FolderDetailScreen() {
     const { name } = useLocalSearchParams<{
@@ -32,6 +34,9 @@ export default function FolderDetailScreen() {
         loading: audiosLoading,
         getAudiosFromFolder,
     } = useAudios();
+
+    const { loadQueue } = useAudio();
+
 
     useEffect(() => {
         getAudioFolders();
@@ -57,9 +62,9 @@ export default function FolderDetailScreen() {
 
         // Save ordered song IDs into SQLite queue table
         createQueue(name, songIds);
+        loadQueue({ resetIndex: true });
 
-        // Navigate to player or queue tab
-        router.push('/(tabs)/queue');
+        router.navigate('/');
     };
 
     const folder = folders.find(
