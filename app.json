@@ -4,32 +4,33 @@
     "slug": "music",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/music.png",
+    "icon": "./assets/images/icon.png",
     "scheme": "music",
     "userInterfaceStyle": "automatic",
     "ios": {
-      "icon": "./assets/images/music.png"
+      "icon": "./assets/images/icon.png"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/music.png",
-        "backgroundColor": "#133630"
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#1b4d42"
       },
       "predictiveBackGestureEnabled": false,
       "package": "com.developerpalakbasak.music"
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/music.png"
+      "favicon": "./assets/images/icon.png"
     },
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
-          "image": "./assets/images/music.png",
-          "imageWidth": 76
+          "backgroundColor": "#1b4d42",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain"
         }
       ],
       "expo-audio",
